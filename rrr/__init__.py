@@ -470,15 +470,15 @@ def record(kernel, rootfs, output="record"):
         raise "Recording execution failed"
     return output
 
-def __replay(rootfs):
+def __replay(rootfs, record):
     panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
                   extra_args=extra_qemu_machine_args)
 
     # Start the Panda replay
     panda.run_replay(record)
 
-def replay(rootfs):
-    p = multiprocessing.Process(target=__replay, args=[rootfs])
+def replay(rootfs, record):
+    p = multiprocessing.Process(target=__replay, args=[rootfs, record])
     p.start()
     p.join()
 
