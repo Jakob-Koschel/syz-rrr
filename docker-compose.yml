@@ -6,3 +6,6 @@ services:
     volumes:
       - ./rrr:/root/rrr
       - ./rrr.ipynb:/root/rrr.ipynb
+      - ./repro.c:/root/repro.c
+      - /home/jkl/Developer/linux/6.4.y:/root/kernel
+      - ./out:/root/out
