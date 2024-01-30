@@ -439,6 +439,7 @@ def snapshot(rootfs, kernel):
 def __record(rootfs, output):
     panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
                   extra_args=extra_qemu_machine_args)
+    panda.serial_console.set_logging('panda_logging.txt')
 
     @panda.queue_blocking
     def drive():
