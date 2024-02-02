@@ -467,7 +467,7 @@ def record(kernel, rootfs, output="record"):
     p.join()
 
     if p.exitcode:
-        raise "Recording execution failed"
+        raise Exception("Recording execution failed")
     return output
 
 def __replay(rootfs, record):
@@ -483,7 +483,7 @@ def replay(rootfs, record):
     p.join()
 
     if p.exitcode:
-        raise "Replay failed"
+        raise Exception("Replay failed")
 
 # Syzbot bug pages parsing and extraction utilities
 def contains_word_case_insensitive(string, word):
@@ -850,7 +850,7 @@ def trace(kernel, rootfs, record, output="trace"):
     p.join()
 
     if p.exitcode:
-        raise "Tracing failed"
+        raise Exception("Tracing failed")
     return output
 
 # HTTP Server to open a trace in Perfetto
