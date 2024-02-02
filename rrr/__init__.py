@@ -274,7 +274,7 @@ class Kernel:
         print(f"task.switch_task_hook_addr = {switch_task_hook_addr}",file=info_file)
 
         init_task_addr = gdb_printf("%llu", f"&init_task")
-        current_task_addr = gdb_printf("%llu", f"&current_task")
+        current_task_addr = gdb_printf("%llu", f"&pcpu_hot.current_task")
         print(f"task.current_task_addr = {current_task_addr}",file=info_file)
         print(f"task.init_addr = {init_task_addr}",file=info_file)
 
