@@ -556,8 +556,9 @@ class CType(Enum):
     PTR = 6
 
 class Func:
-    def __init__(self, symbol):
+    def __init__(self, symbol, address):
         self.symbol = symbol
+        self.address = address
         self.ret_type = CType.VOID
         self.arg_names = []
         self.arg_types = []
@@ -821,7 +822,7 @@ def trace(kernel, rootfs, record, output="trace"):
                     if re.match(ignored_symbols_re, name):
                         ignored_addresses.add(address)
 
-                    f = Func(name)
+                    f = Func(name, address)
                     func_map[address] = f
                     symbol_map[name] = f
 
