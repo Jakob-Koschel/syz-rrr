@@ -477,8 +477,38 @@ def __replay(rootfs, record):
     # Start the Panda replay
     panda.run_replay(record)
 
-def replay(rootfs, record):
-    p = multiprocessing.Process(target=__replay, args=[rootfs, record])
+def replay(rootfs, kernel, record, replay_func=__replay):
+    # Some symbols (like sanitizer instrumentations) make the trace a lot bigger
+    # and harder to read. Skip them by default. We could make this configurable if
+    # inspecting their arguments proves useful to debugging.
+    ignored_symbols_re = re.compile(r'kasan_check_range|__kasan_check_|__asan_|__sanitizer_cov_trace_|.*lockdep_')
+    ignored_addresses = set()
+
+    # Parse all known ELF symbol tables
+    elf_files = [kernel.debug_path, rootfs.busybox_debug_path, rootfs.stimulus_debug_path]
+    func_map = {}
+    symbol_map = {}
+    for elf_file in elf_files:
+        with open(elf_file, 'rb') as f:
+            log("Parsing " + elf_file + " debug info...")
+
+            result = subprocess.run(['nm', elf_file], stdout=subprocess.PIPE)
+            if b"no symbols" in result.stdout:
+                continue
+            for line in result.stdout.split(b"\n"):
+                elements = line.split()
+                if len(elements) == 3:
+                    address = int(elements[0], 16)
+                    name = elements[2].decode('unicode_escape')
+
+                    if re.match(ignored_symbols_re, name):
+                        ignored_addresses.add(address)
+
+                    f = Func(name, address)
+                    func_map[address] = f
+                    symbol_map[name] = f
+
+    p = multiprocessing.Process(target=replay_func, args=[rootfs, kernel, record, ignored_addresses, func_map])
     p.start()
     p.join()
 
