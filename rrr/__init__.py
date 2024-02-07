@@ -336,7 +336,7 @@ class Rootfs:
             revparse = subprocess.run(["git", "rev-parse", "--verify", busybox_commit_hash],
                                       capture_output=True, text=True, cwd=busybox_path)
             if revparse.returncode:
-                log(f"{busybox_commit_hash} missing - fetching {busybox_url} in {path} ...")
+                log(f"{busybox_commit_hash} missing - fetching {busybox_url} in {busybox_path} ...")
                 clone = subprocess.run(["git", "fetch", busybox_url],
                                        capture_output=True, text=True, cwd=busybox_path)
 
