@@ -508,7 +508,7 @@ def replay(rootfs, kernel, record, replay_func=__replay):
                     func_map[address] = f
                     symbol_map[name] = f
 
-    p = multiprocessing.Process(target=replay_func, args=[rootfs, kernel, record, ignored_addresses, func_map])
+    p = multiprocessing.Process(target=replay_func, args=[rootfs, kernel, record, ignored_addresses, func_map, symbol_map])
     p.start()
     p.join()
 
