@@ -81,6 +81,20 @@ read
 setsid /sbin/getty -l /bin/sh -n 115200 ttyS0
 """
 
+config = {
+    "arch": arch,
+    "mem": mem,
+    "extra_qemu_kernel_args": extra_qemu_kernel_args,
+    "extra_qemu_machine_args": extra_qemu_machine_args,
+    "expect_prompt": expect_prompt,
+    "ready_serial_signal": ready_serial_signal,
+    "init_code": init_code,
+}
+
+def update_config(conf):
+    global config
+    config = conf
+
 # Small helper for conditional logging
 logging = True
 def log(str):
@@ -386,7 +400,7 @@ class Rootfs:
         # Instal an init script
         init_path = os.path.join(rootfs_path, "init")
         with open(init_path, "w") as init:
-            init.write(init_code)
+            init.write(config["init_code"])
 
         # Chmod +x /init and /repro
         for path in [init_path, repro_path]:
@@ -409,12 +423,12 @@ def has_snapshot(rootfs):
 # Panda analysis passes
 # Run in different processes because each Panda object requires a fresh address space
 def __snapshot(rootfs, kernel):
-    panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
-                  extra_args=extra_qemu_machine_args + " " + extra_qemu_kernel_args.format(kernel))
+    panda = Panda(arch=config["arch"], mem=config["mem"], expect_prompt=config["expect_prompt"], qcow=rootfs.path,
+                  extra_args=config["extra_qemu_machine_args"] + " " + config["extra_qemu_kernel_args"].format(kernel))
 
     @panda.queue_blocking
     def setup():
-        panda.serial_read_until(ready_serial_signal.encode())
+        panda.serial_read_until(config["ready_serial_signal"].encode())
         log("Reached snapshot point. Giving Panda 5 second to save it...")
 
         charptr = panda.ffi.new("char[]", bytes("root", "utf-8"))
@@ -437,8 +451,8 @@ def snapshot(rootfs, kernel):
         raise "Taking snapshot failed"
 
 def __record(rootfs, output):
-    panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
-                  extra_args=extra_qemu_machine_args)
+    panda = Panda(arch=config["arch"], mem=config["mem"], expect_prompt=config["expect_prompt"], qcow=rootfs.path,
+                  extra_args=config["extra_qemu_machine_args"])
     panda.serial_console.set_logging('panda_logging.txt')
 
     @panda.queue_blocking
@@ -471,8 +485,8 @@ def record(kernel, rootfs, output="record"):
     return output
 
 def __replay(rootfs, record):
-    panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
-                  extra_args=extra_qemu_machine_args)
+    panda = Panda(arch=config["arch"], mem=config["mem"], expect_prompt=config["expect_prompt"], qcow=rootfs.path,
+                  extra_args=config["extra_qemu_machine_args"])
 
     # Start the Panda replay
     panda.run_replay(record)
@@ -599,8 +613,8 @@ class Func:
         self.arg_types.append(t)
 
 def __trace(kernel, rootfs, record, trace_path, ignored_addresses, func_map):
-    panda = Panda(arch=arch, mem=mem, expect_prompt=expect_prompt, qcow=rootfs.path,
-                  extra_args=extra_qemu_machine_args, os_version="linux-64-linux:1.0")
+    panda = Panda(arch=config["arch"], mem=config["mem"], expect_prompt=config["expect_prompt"], qcow=rootfs.path,
+                  extra_args=config["extra_qemu_machine_args"], os_version="linux-64-linux:1.0")
 
     # Create a Perfetto trace
     trace = Trace()
