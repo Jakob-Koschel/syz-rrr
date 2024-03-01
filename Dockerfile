@@ -146,9 +146,9 @@ RUN apt-get -qq install -y gcc libguestfs-tools make flex bison libelf-dev bc li
 
 # Install bpftool from Debian's repository because Ubuntu 22.04 doesn't have it...
 # TODO: Find a more reliably way to download it
-RUN wget http://ftp.ch.debian.org/debian/pool/main/l/linux/bpftool_7.3.0+6.7.1-1~exp1_amd64.deb
-RUN dpkg -i bpftool_7.3.0+6.7.1-1~exp1_amd64.deb
-RUN rm bpftool_7.3.0+6.7.1-1~exp1_amd64.deb
+RUN wget http://ftp.ch.debian.org/debian/pool/main/l/linux/bpftool_7.3.0+6.7.4-1~exp1_amd64.deb
+RUN dpkg -i bpftool_7.3.0+6.7.4-1~exp1_amd64.deb
+RUN rm bpftool_7.3.0+6.7.4-1~exp1_amd64.deb
 
 # Install python dependencies
 RUN pip install --no-cache-dir --upgrade pip jupyter protobuf pandas lxml pygdbmi perfetto
