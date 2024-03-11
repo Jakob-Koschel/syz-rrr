@@ -491,7 +491,7 @@ def __replay(rootfs, record):
     # Start the Panda replay
     panda.run_replay(record)
 
-def replay(rootfs, kernel, record, replay_func=__replay):
+def replay(rootfs, kernel, record, replay_func=__replay, additional_args=None):
     # Some symbols (like sanitizer instrumentations) make the trace a lot bigger
     # and harder to read. Skip them by default. We could make this configurable if
     # inspecting their arguments proves useful to debugging.
@@ -522,7 +522,11 @@ def replay(rootfs, kernel, record, replay_func=__replay):
                     func_map[address] = f
                     symbol_map[name] = f
 
-    p = multiprocessing.Process(target=replay_func, args=[rootfs, kernel, record, ignored_addresses, func_map, symbol_map])
+    args = [rootfs, kernel, record, ignored_addresses, func_map, symbol_map]
+    if additional_args:
+        args.extend(additional_args)
+
+    p = multiprocessing.Process(target=replay_func, args=args)
     p.start()
     p.join()
 
