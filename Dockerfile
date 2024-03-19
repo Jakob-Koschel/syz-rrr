@@ -8,7 +8,7 @@ ARG BASE_IMAGE
 
 # Download the Panda source code
 RUN apt-get -qq update && apt-get -qq install -y git
-RUN git clone https://github.com/panda-re/panda /panda/
+RUN git clone --depth 1 --branch v1.8.8 https://github.com/panda-re/panda /panda/
 
 # syz-rrr: instead of copying we take it from the clone just above
 # Copy dependencies lists into container. We copy them all and then do a mv because
