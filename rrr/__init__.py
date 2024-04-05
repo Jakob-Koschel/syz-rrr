@@ -338,7 +338,12 @@ class Kernel:
 # Origin of a rootfs (busybox + stimulus)
 class Rootfs:
     def __init__(self, stimulus, busybox_url="https://github.com/mirror/busybox", busybox_commit_hash="1_36_0",
-                 busybox_path="busybox/", rootfs_path="rootfs/", image_path="rootfs.qcow2"):
+                 busybox_path="busybox/", rootfs_path="rootfs/", image_path="rootfs.qcow2", avoid_create=False):
+        if avoid_create:
+            self.path = image_path
+            self.stimulus_debug_path = stimulus.built_path
+            return
+
         if not os.path.exists(busybox_path):
             log(f"Cloning {busybox_url} to {busybox_path} ...")
             clone = subprocess.run(["git", "clone", busybox_url, busybox_path],
