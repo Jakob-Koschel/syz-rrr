@@ -341,7 +341,8 @@ class Rootfs:
                  busybox_path="busybox/", rootfs_path="rootfs/", image_path="rootfs.qcow2", avoid_create=False):
         if avoid_create:
             self.path = image_path
-            self.stimulus_debug_path = stimulus.built_path
+            if stimulus:
+                self.stimulus_debug_path = stimulus.built_path
             return
 
         if not os.path.exists(busybox_path):
@@ -397,10 +398,12 @@ class Rootfs:
             except FileExistsError:
                 pass
 
-        # Install the static reproducer
-        repro_path = os.path.join(rootfs_path, "repro")
-        shutil.copyfile(stimulus.built_path, repro_path)
-        self.stimulus_debug_path = stimulus.built_path
+        repro_path = None
+        if stimulus:
+            # Install the static reproducer
+            repro_path = os.path.join(rootfs_path, "repro")
+            shutil.copyfile(stimulus.built_path, repro_path)
+            self.stimulus_debug_path = stimulus.built_path
 
         # Instal an init script
         init_path = os.path.join(rootfs_path, "init")
@@ -409,6 +412,8 @@ class Rootfs:
 
         # Chmod +x /init and /repro
         for path in [init_path, repro_path]:
+            if not path:
+                continue
             mode = os.stat(path).st_mode
             os.chmod(path, mode | stat.S_IEXEC)
 
@@ -508,6 +513,8 @@ def replay(rootfs, kernel, record, replay_func=__replay, additional_args=None):
     func_map = {}
     symbol_map = {}
     for elf_file in elf_files:
+        if not elf_file:
+            continue
         with open(elf_file, 'rb') as f:
             log("Parsing " + elf_file + " debug info...")
 
