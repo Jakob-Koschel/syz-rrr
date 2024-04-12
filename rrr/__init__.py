@@ -481,12 +481,16 @@ def __record(rootfs, output):
 
     panda.run()
 
-def record(kernel, rootfs, output="record"):
+def record(kernel, rootfs, record_func=__record, output="record", additional_args=None):
     if not has_snapshot(rootfs):
         print("No booted snapshot found. Booting once...")
         snapshot(rootfs, kernel)
 
-    p = multiprocessing.Process(target=__record, args=(rootfs, output))
+    args = [rootfs, output]
+    if additional_args:
+        args.extend(additional_args)
+
+    p = multiprocessing.Process(target=record_func, args=args)
     p.start()
     p.join()
 
