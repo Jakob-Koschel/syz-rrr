@@ -339,6 +339,8 @@ class Kernel:
 class Rootfs:
     def __init__(self, stimulus, busybox_url="https://github.com/mirror/busybox", busybox_commit_hash="1_36_0",
                  busybox_path="busybox/", rootfs_path="rootfs/", image_path="rootfs.qcow2", avoid_create=False):
+        self.stimulus_debug_path = None
+
         if avoid_create:
             self.path = image_path
             if stimulus:
