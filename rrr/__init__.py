@@ -343,6 +343,7 @@ class Rootfs:
 
         if avoid_create:
             self.path = image_path
+            self.busybox_debug_path = os.path.join(busybox_path, "busybox_unstripped")
             if stimulus:
                 self.stimulus_debug_path = stimulus.built_path
             return
