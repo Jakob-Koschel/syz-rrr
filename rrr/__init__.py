@@ -422,7 +422,7 @@ class Rootfs:
 
         # Generate the qcow2 image
         log(f"Generating {image_path} ...")
-        virtmakefs = subprocess.run(["virt-make-fs", "--format=qcow2", "--type=ext4",
+        virtmakefs = subprocess.run(["virt-make-fs", "--size=500M", "--format=qcow2", "--type=ext4",
                                      rootfs_path, image_path], capture_output=True, text=True)
         if virtmakefs.returncode:
             raise Exception("Generating a qcow2 image failed: " + virtmakefs.stderr)
